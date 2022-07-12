@@ -7,24 +7,27 @@ const qSAll = function(elAll){
 }
 
 let modalQtd = 1;
-
+let key;
 let cart = [];
 
 // LISTAGEM DAS PIZZAS
-pizzaJson.map ((item, index) => {
+pizzaJson.map ((item, index) => { //mapear o array buscando cada elemento
     pizzaItem = qS('.models .pizza-item').cloneNode(true); //armazenando os objetos do JSON e realizando o clone desses.
 
     pizzaItem.setAttribute('data-key', index);
     //adicionando as informações e imagens nos objetos.
     pizzaItem.querySelector('.pizza-item--img img').src = item.img;
-    pizzaItem.querySelector('.pizza-item--price').innerHTML = `R$ ${item.price.toFixed(2)}`;
+    pizzaItem.querySelector('.pizza-item--price').innerHTML = `${item.price[2].toFixed(2)} €`;
     pizzaItem.querySelector('.pizza-item--name').innerHTML = item.name;
     pizzaItem.querySelector('.pizza-item--desc').innerHTML = item.description; 
+
+    qS('.pizza-area').append(pizzaItem); //adicionamos os 7 objetos que está no JSON na classe .pizza-area através do parametro .Append e instanciamos a variavel pizzaItem que armazenou os obejtos que foram clonados. 
+
 
     pizzaItem.querySelector('a').addEventListener('click', (e)=>{
         e.preventDefault(); //previnindo a ação do link <a> ao clicar
      
-        let key = e.target.closest('.pizza-item').getAttribute('data-key'); //percorrendo o alvo pizza item e pegando o atributo data-key
+        key = e.target.closest('.pizza-item').getAttribute('data-key'); //percorrendo o alvo pizza-item e pegando o atributo data-key
 
         maiorQtd = 1;
 
@@ -36,7 +39,7 @@ pizzaJson.map ((item, index) => {
 
         qS('.pizzaInfo--desc').innerHTML = pizzaJson[key].description;
 
-        qS('.pizzaInfo--actualPrice').innerHTML = `R$ ${pizzaJson[key].price.toFixed(2)}`;
+        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[2].toFixed(2)} €`;
 
         qS('.pizzaInfo--size.selected').classList.remove('selected');
 
@@ -58,8 +61,7 @@ pizzaJson.map ((item, index) => {
         }, 200);      
 
    });   
-   qS('.pizza-area').append(pizzaItem); //adicionamos os 7 objetos que está no JSON na classe .pizza-area através do parametro .Append e instanciamos a variavel pizzaItem que armazenou os obejtos que foram clonados. 
-
+  
 })
 
 //EVENTOS DO MODAL
@@ -68,7 +70,7 @@ function closeModal(){ //função para fechar o modal clicando em cancelar ou vo
     qS('.pizzaWindowArea').style.opacity = 0;
     setTimeout(() => {
         qS('.pizzaWindowArea').style.display = 'none';
-    }, 200); 
+    }, 500); 
 }
 
 qSAll('.pizzaInfo--cancelButton, .pizzaInfo--cancelMobileButton').forEach((item)=>{
@@ -81,19 +83,20 @@ qS('.pizzaInfo--qtmenos').addEventListener('click', ()=>{
 
     if(modalQtd > 1){
         modalQtd--;
-        qS('.pizzaInfo--qt').innerHTML = maiorQtd;
+        qS('.pizzaInfo--qt').innerHTML = modalQtd;
     }
-
+    
 });
 
 qS('.pizzaInfo--qtmais').addEventListener('click', ()=>{
     modalQtd++;
     qS('.pizzaInfo--qt').innerHTML = modalQtd;
 });
-qSAll('.pizzaInfo--size').forEach((size, sizeIndex) => {
+qSAll('.pizzaInfo--size').forEach((size) => {
     size.addEventListener('click', ()=>{
         qS('.pizzaInfo--size.selected').classList.remove('selected');
         size.classList.add('selected');
+        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[size.getAttribute('data-key')].toFixed(2)} €`;
     });            
 
 });
@@ -126,18 +129,82 @@ qS('.pizzaInfo--addButton').addEventListener('click', () => {
 
 });
 
+qS('.menu-openner').addEventListener('click',() => {
+    if(cart.length > 0){
+        qS('aside').style.left = '0';
+    }
+});
+
+qS('.menu-closer').addEventListener('click', ()=>{
+    qS('aside').style.left = '100vw';
+});
+
 function updateCart(){
+
+    qS('.menu-openner span').innerHTML = cart.length;
+
     if(cart.length > 0){
         qS('aside').classList.add('show');
+        qS('.cart').innerHTML = '';
+
+        let subtotal = 0;
+        let desconto = 0;
+        let total = 0;
 
         for(let i in cart){
-            
             let pizzaItem = pizzaJson.find((item)=> item.id == cart[i].id);
 
+            let pz = cart[i].size;
+            subtotal += pizzaItem.price[pz] * cart[i].qt;
+
+            let cartItem = qS('.models .cart--item').cloneNode(true);
+
+            let pizzaSizeName;
+            switch(pz){
+                case 0:
+                    pizzaSizeName = 'P';
+                    break;
+                case 1:
+                    pizzaSizeName = 'M';
+                    break;
+                case 2:
+                    pizzaSizeName = 'G';
+                    break;        
+            }
+
+            let pizzaName = `${pizzaItem.name}(${pizzaSizeName})`;
+
+            cartItem.querySelector('img').src = pizzaItem.img;
+            cartItem.querySelector('.cart--item-nome').innerHTML = pizzaName;
+            cartItem.querySelector('.cart--item--qt').innerHTML =cart[i].qt;
+            cartItem.querySelector('.cart--item-qtmenos').addEventListener('click', () => {
+                if(cart[i].qt > 1){
+                    cart[i].qt--;
+                }else {
+                    cart.splice(i, 1);
+                }
+                updateCart();
+            });
+
+            cartItem.querySelector('.cart--item-qtmais').addEventListener('click', ()=>{
+                cart[i].qt++;
+                updateCart();
+            });
+
+
+
+            qS('.cart').append(cartItem);
         }
+
+        desconto = subtotal * 0.1;
+        total = subtotal - desconto;
+
+        qS('.subtotal span:last-child').innerHTML = `R$ ${subtotal.toFixed(2)}`;
+        qS('.desconto span:last-child').innerHTML = `R$ ${desconto.toFixed(2)}`;
+        qS('.total span:last-child').innerHTML = `R$ ${total.toFixed(2)}`;
 
     }else{
         qS('aside').classList.remove('show');
-
+        qS('aside').style.left = '100vw';
     }
 }
