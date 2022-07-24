@@ -17,7 +17,8 @@ pizzaJson.map ((item, index) => { //mapear o array buscando cada elemento
     pizzaItem.setAttribute('data-key', index);
     //adicionando as informações e imagens nos objetos.
     pizzaItem.querySelector('.pizza-item--img img').src = item.img;
-    pizzaItem.querySelector('.pizza-item--price').innerHTML = `${item.price[2].toFixed(2).replace(".",",")} €`;
+    pizzaItem.querySelector('.pizza-item--price').innerHTML = `${item.price[2].toFixed(2).replace(".",",")}€`;
+    pizzaItem.querySelector('.pizza-item--price').innerHTML = `${item.price[2].toFixed(2).replace(".",",")}€`;
     pizzaItem.querySelector('.pizza-item--name').innerHTML = item.name;
     pizzaItem.querySelector('.pizza-item--desc').innerHTML = item.description; 
 
@@ -39,7 +40,10 @@ pizzaJson.map ((item, index) => { //mapear o array buscando cada elemento
 
         qS('.pizzaInfo--desc').innerHTML = pizzaJson[key].description;
 
+
         qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[2].toFixed(2).replace(".",",")} €`;
+
+        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[2].toFixed(2)} €`;
 
         qS('.pizzaInfo--size.selected').classList.remove('selected');
 
@@ -96,7 +100,9 @@ qSAll('.pizzaInfo--size').forEach((size) => {
     size.addEventListener('click', ()=>{
         qS('.pizzaInfo--size.selected').classList.remove('selected');
         size.classList.add('selected');
-        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[size.getAttribute('data-key')].toFixed(2).replace(".",",")} €`;
+
+        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[size.getAttribute('data-key')].toFixed(2).replace(".",",")}€`;
+        qS('.pizzaInfo--actualPrice').innerHTML = `${pizzaJson[key].price[size.getAttribute('data-key')].toFixed(2)}€`;
     });            
 
 });
@@ -202,6 +208,10 @@ function updateCart(){
         qS('.subtotal span:last-child').innerHTML = `${subtotal.toFixed(2).replace(".",",")}€`;
         qS('.desconto span:last-child').innerHTML = `${desconto.toFixed(2).replace(".",",")}€`;
         qS('.total span:last-child').innerHTML = `${total.toFixed(2).replace(".",",")}€`;
+        qS('.subtotal span:last-child').innerHTML = `${subtotal.toFixed(2).replace(".",",")}€`;
+        qS('.desconto span:last-child').innerHTML = `${desconto.toFixed(2).replace(".",",")}€`;
+        qS('.total span:last-child').innerHTML = `${total.toFixed(2).replace(".",",")}€`;
+
 
     }else{
         qS('aside').classList.remove('show');
